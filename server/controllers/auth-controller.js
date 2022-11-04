@@ -1,16 +1,20 @@
-const auth = require('../auth')
-const User = require('../models/user-model')
-const bcrypt = require('bcryptjs')
-
+const auth = require("../auth");
+const User = require("../models/user-model");
+const bcrypt = require("bcryptjs");
+/**
+ * inspect if the jwt is valid
+ */
 getLoggedIn = async (req, res) => {
+    console.log("IN GET LOGGED IN");
     try {
         let userId = auth.verifyUser(req);
+        console.log("ID: " + userId);
         if (!userId) {
             return res.status(200).json({
                 loggedIn: false,
                 user: null,
-                errorMessage: "?"
-            })
+                errorMessage: "?",
+            });
         }
 
         const loggedInUser = await User.findOne({ _id: userId });
@@ -21,14 +25,14 @@ getLoggedIn = async (req, res) => {
             user: {
                 firstName: loggedInUser.firstName,
                 lastName: loggedInUser.lastName,
-                email: loggedInUser.email
-            }
-        })
+                email: loggedInUser.email,
+            },
+        });
     } catch (err) {
         console.log("err: " + err);
         res.json(false);
     }
-}
+};
 
 loginUser = async (req, res) => {
     console.log("loginUser");
@@ -44,22 +48,21 @@ loginUser = async (req, res) => {
         const existingUser = await User.findOne({ email: email });
         console.log("existingUser: " + existingUser);
         if (!existingUser) {
-            return res
-                .status(401)
-                .json({
-                    errorMessage: "Wrong email or password provided."
-                })
+            return res.status(401).json({
+                errorMessage: "Wrong email or password provided.",
+            });
         }
 
         console.log("provided password: " + password);
-        const passwordCorrect = await bcrypt.compare(password, existingUser.passwordHash);
+        const passwordCorrect = await bcrypt.compare(
+            password,
+            existingUser.passwordHash
+        );
         if (!passwordCorrect) {
             console.log("Incorrect password");
-            return res
-                .status(401)
-                .json({
-                    errorMessage: "Wrong email or password provided."
-                })
+            return res.status(401).json({
+                errorMessage: "Wrong email or password provided.",
+            });
         }
 
         // LOGIN THE USER
@@ -69,35 +72,48 @@ loginUser = async (req, res) => {
         res.cookie("token", token, {
             httpOnly: true,
             secure: true,
-            sameSite: true
-        }).status(200).json({
-            success: true,
-            user: {
-                firstName: existingUser.firstName,
-                lastName: existingUser.lastName,  
-                email: existingUser.email              
-            }
+            sameSite: true,
         })
-
+            .status(200)
+            .json({
+                success: true,
+                user: {
+                    firstName: existingUser.firstName,
+                    lastName: existingUser.lastName,
+                    email: existingUser.email,
+                },
+            });
     } catch (err) {
         console.error(err);
         res.status(500).send();
     }
-}
+};
 
 logoutUser = async (req, res) => {
     res.cookie("token", "", {
         httpOnly: true,
         expires: new Date(0),
         secure: true,
-        sameSite: "none"
+        sameSite: "none",
     }).send();
-}
+};
 
 registerUser = async (req, res) => {
     try {
-        const { firstName, lastName, email, password, passwordVerify } = req.body;
-        console.log("create user: " + firstName + " " + lastName + " " + email + " " + password + " " + passwordVerify);
+        const { firstName, lastName, email, password, passwordVerify } =
+            req.body;
+        console.log(
+            "create user: " +
+                firstName +
+                " " +
+                lastName +
+                " " +
+                email +
+                " " +
+                password +
+                " " +
+                passwordVerify
+        );
         if (!firstName || !lastName || !email || !password || !passwordVerify) {
             return res
                 .status(400)
@@ -105,30 +121,26 @@ registerUser = async (req, res) => {
         }
         console.log("all fields provided");
         if (password.length < 8) {
-            return res
-                .status(400)
-                .json({
-                    errorMessage: "Please enter a password of at least 8 characters."
-                });
+            return res.status(400).json({
+                errorMessage:
+                    "Please enter a password of at least 8 characters.",
+            });
         }
         console.log("password long enough");
         if (password !== passwordVerify) {
-            return res
-                .status(400)
-                .json({
-                    errorMessage: "Please enter the same password twice."
-                })
+            return res.status(400).json({
+                errorMessage: "Please enter the same password twice.",
+            });
         }
         console.log("password and password verify match");
         const existingUser = await User.findOne({ email: email });
         console.log("existingUser: " + existingUser);
         if (existingUser) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    errorMessage: "An account with this email address already exists."
-                })
+            return res.status(400).json({
+                success: false,
+                errorMessage:
+                    "An account with this email address already exists.",
+            });
         }
 
         const saltRounds = 10;
@@ -137,7 +149,10 @@ registerUser = async (req, res) => {
         console.log("passwordHash: " + passwordHash);
 
         const newUser = new User({
-            firstName, lastName, email, passwordHash
+            firstName,
+            lastName,
+            email,
+            passwordHash,
         });
         const savedUser = await newUser.save();
         console.log("new user saved: " + savedUser._id);
@@ -146,30 +161,32 @@ registerUser = async (req, res) => {
         const token = auth.signToken(savedUser._id);
         console.log("token:" + token);
 
-        await res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none"
-        }).status(200).json({
-            success: true,
-            user: {
-                firstName: savedUser.firstName,
-                lastName: savedUser.lastName,  
-                email: savedUser.email              
-            }
-        })
+        await res
+            .cookie("token", token, {
+                httpOnly: true,
+                secure: true,
+                sameSite: "none",
+            })
+            .status(200)
+            .json({
+                success: true,
+                user: {
+                    firstName: savedUser.firstName,
+                    lastName: savedUser.lastName,
+                    email: savedUser.email,
+                },
+            });
 
         console.log("token sent");
-
     } catch (err) {
         console.error(err);
         res.status(500).send();
     }
-}
+};
 
 module.exports = {
     getLoggedIn,
     registerUser,
     loginUser,
-    logoutUser
-}
+    logoutUser,
+};
