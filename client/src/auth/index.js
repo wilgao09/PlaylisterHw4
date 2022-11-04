@@ -11,6 +11,8 @@ export const AuthActionType = {
     LOGIN_USER: "LOGIN_USER",
     LOGOUT_USER: "LOGOUT_USER",
     REGISTER_USER: "REGISTER_USER",
+    FAILED_OPERATION: "FAILED_OPERATION",
+    RESET_FAILED_OPERATION: "LOGOUT_USER",
 };
 
 function AuthContextProvider(props) {
@@ -51,6 +53,14 @@ function AuthContextProvider(props) {
                     loggedIn: true,
                 });
             }
+            case AuthActionType.FAILED_OPERATION: {
+                return setAuth({
+                    user: null,
+                    loggedIn: false,
+                    failedLogin: payload.failedLogin ?? false,
+                    failedRegister: payload.failedRegister ?? false,
+                });
+            }
             default:
                 return auth;
         }
@@ -76,35 +86,58 @@ function AuthContextProvider(props) {
         password,
         passwordVerify
     ) {
-        const response = await api.registerUser(
-            firstName,
-            lastName,
-            email,
-            password,
-            passwordVerify
-        );
-        if (response.status === 200) {
-            authReducer({
-                type: AuthActionType.REGISTER_USER,
-                payload: {
-                    user: response.data.user,
-                },
+        // const response = await api.registerUser(
+        //     firstName,
+        //     lastName,
+        //     email,
+        //     password,
+        //     passwordVerify
+        // );
+        api.registerUser(firstName, lastName, email, password, passwordVerify)
+            .then((response) => {
+                if (response.status === 200) {
+                    authReducer({
+                        type: AuthActionType.REGISTER_USER,
+                        payload: {
+                            user: response.data.user,
+                        },
+                    });
+                    history.push("/");
+                } else {
+                    alert("got non failnig non 200 response code");
+                }
+            })
+            .catch((reason) => {
+                authReducer({
+                    type: AuthActionType.FAILED_OPERATION,
+                    payload: {
+                        failedRegister: reason.response.data.errorMessage,
+                    },
+                });
             });
-            history.push("/");
-        }
     };
 
-    auth.loginUser = async function (email, password) {
-        const response = await api.loginUser(email, password);
-        if (response.status === 200) {
-            authReducer({
-                type: AuthActionType.LOGIN_USER,
-                payload: {
-                    user: response.data.user,
-                },
+    auth.loginUser = function (email, password) {
+        api.loginUser(email, password)
+            .then((response) => {
+                if (response.status === 200) {
+                    authReducer({
+                        type: AuthActionType.LOGIN_USER,
+                        payload: {
+                            user: response.data.user,
+                        },
+                    });
+                    history.push("/");
+                } else {
+                    alert("got a nonfailing, non 200 code");
+                }
+            })
+            .catch((reason) => {
+                authReducer({
+                    type: AuthActionType.FAILED_OPERATION,
+                    payload: { failedLogin: reason.response.data.errorMessage },
+                });
             });
-            history.push("/");
-        }
     };
 
     auth.logoutUser = async function () {
@@ -126,6 +159,13 @@ function AuthContextProvider(props) {
         }
         console.log("user initials: " + initials);
         return initials;
+    };
+
+    auth.resetFailure = function () {
+        authReducer({
+            type: AuthActionType.RESET_FAILED_OPERATION,
+            payload: {},
+        });
     };
 
     return (
