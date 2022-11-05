@@ -1,9 +1,9 @@
-import React, { useContext, useState } from 'react'
-import { GlobalStoreContext } from '../store'
+import React, { useContext, useState } from "react";
+import { GlobalStoreContext } from "../store";
 
 function SongCard(props) {
     const { store } = useContext(GlobalStoreContext);
-    const [ draggedTo, setDraggedTo ] = useState(0);
+    const [draggedTo, setDraggedTo] = useState(0);
     const { song, index } = props;
 
     function handleDragStart(event) {
@@ -38,7 +38,7 @@ function SongCard(props) {
     }
     function handleClick(event) {
         // DOUBLE CLICK IS FOR SONG EDITING
-        if (event.detail === 2) {
+        if (event.detail == 2) {
             store.showEditSongModal(index, song);
         }
     }
@@ -47,7 +47,7 @@ function SongCard(props) {
     return (
         <div
             key={index}
-            id={'song-' + index + '-card'}
+            id={"song-" + index + "-card"}
             className={cardClass}
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
@@ -59,9 +59,10 @@ function SongCard(props) {
         >
             {index + 1}.
             <a
-                id={'song-' + index + '-link'}
+                id={"song-" + index + "-link"}
                 className="song-link"
-                href={"https://www.youtube.com/watch?v=" + song.youTubeId}>
+                href={"https://www.youtube.com/watch?v=" + song.youTubeId}
+            >
                 {song.title} by {song.artist}
             </a>
             <input

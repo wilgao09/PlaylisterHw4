@@ -338,6 +338,7 @@ input {
 }
 
 #confirm-cancel-container {
+    background-color: var(--swatch-accent);
     text-align: center;
 }
 
