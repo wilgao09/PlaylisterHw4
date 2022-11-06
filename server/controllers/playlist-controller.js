@@ -26,6 +26,13 @@ createPlaylist = (req, res) => {
 
     User.findOne({ _id: req.userId }, (err, user) => {
         console.log("user found: " + JSON.stringify(user));
+        if (user.email !== body.ownerEmail) {
+            return res.status(403).json({
+                success: false,
+                error: "Cannot create playlists for another use",
+            });
+        }
+
         user.playlists.push(playlist._id);
         user.save().then(() => {
             playlist
@@ -62,6 +69,16 @@ deletePlaylist = async (req, res) => {
                 if (user._id == req.userId) {
                     console.log("correct user!");
                     Playlist.findOneAndDelete({ _id: req.params.id }, () => {
+                        let found = false;
+                        for (let i = 0; i < user.playlists.length; i++) {
+                            if (user.playlists[i] == req.params.id) {
+                                user.playlists.splice(i, 1);
+                                found = true;
+                            }
+                        }
+                        if (found) {
+                            user.save();
+                        }
                         return res.status(200).json({
                             success: true,
                         });

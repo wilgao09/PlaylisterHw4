@@ -52,7 +52,10 @@ export default function MUIRemoveSongModal() {
                                 {songTitle} from the playlist?
                             </div>
                         </div>
-                        <div className="modal-footer">
+                        <div
+                            className="modal-footer"
+                            id="confirm-cancel-container"
+                        >
                             <input
                                 type="button"
                                 id="remove-song-confirm-button"

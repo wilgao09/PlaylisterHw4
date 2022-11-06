@@ -25,14 +25,34 @@ function WorkspaceScreen(props) {
     if (!store.currentList) {
         let id = props.match.params.id;
         store.setCurrentList(id);
-        return <div>404 NOT FOUND</div>;
+        return (
+            <div
+                style={{
+                    textAlign: "center",
+                    fontSize: "45pt",
+                    overflow: "scroll",
+                    height: "100%",
+                }}
+            >
+                You need access to this playlist. And you don't.
+                <img src="https://gumlet.assettype.com/afkgaming%2Fimport%2Fmedia%2Fimages%2F55143-08bf98e6a4535406acafc015adf99434.jpeg?format=auto" />
+            </div>
+        );
     }
 
     return (
-        <Box>
+        <Box
+            sx={{
+                height: "80%",
+                overflow: "scroll",
+            }}
+        >
             <List
                 id="playlist-cards"
-                sx={{ width: "100%", bgcolor: "background.paper" }}
+                sx={{
+                    width: "100%",
+                    bgcolor: "background.paper",
+                }}
             >
                 {store.currentList.songs.map((song, index) => (
                     <SongCard
