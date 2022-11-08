@@ -163,7 +163,11 @@ getPlaylistPairs = async (req, res) => {
     }).catch((err) => console.log(err));
 };
 getPlaylists = async (req, res) => {
-    await Playlist.find({}, (err, playlists) => {
+    let useremail = "";
+    await User.findOne({ _id: req.userId }, (err, dat) => {
+        useremail = dat.email;
+    });
+    await Playlist.find({ ownerEmail: useremail }, (err, playlists) => {
         if (err) {
             return res.status(400).json({ success: false, error: err });
         }

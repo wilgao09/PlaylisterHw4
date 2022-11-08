@@ -369,6 +369,7 @@ function GlobalStoreContextProvider(props) {
     store.isRemoveSongModalOpen = () => {
         return store.currentModal === CurrentModal.REMOVE_SONG;
     };
+    store.isModalOpen = () => store.currentModal !== CurrentModal.NONE;
 
     // THE FOLLOWING 8 FUNCTIONS ARE FOR COORDINATING THE UPDATING
     // OF A LIST, WHICH INCLUDES DEALING WITH THE TRANSACTION STACK. THE
@@ -377,6 +378,7 @@ function GlobalStoreContextProvider(props) {
     store.setCurrentList = function (id) {
         async function asyncSetCurrentList(id) {
             let response = await api.getPlaylistById(id);
+            tps.clearAllTransactions();
             if (response.data.success) {
                 let playlist = response.data.playlist;
 
@@ -519,16 +521,24 @@ function GlobalStoreContextProvider(props) {
         tps.doTransaction();
     };
     store.canAddNewSong = function () {
-        return store.currentList !== null;
+        return !store.isModalOpen() && store.currentList !== null;
     };
     store.canUndo = function () {
-        return store.currentList !== null && tps.hasTransactionToUndo();
+        return (
+            !store.isModalOpen() &&
+            store.currentList !== null &&
+            tps.hasTransactionToUndo()
+        );
     };
     store.canRedo = function () {
-        return store.currentList !== null && tps.hasTransactionToRedo();
+        return (
+            !store.isModalOpen() &&
+            store.currentList !== null &&
+            tps.hasTransactionToRedo()
+        );
     };
     store.canClose = function () {
-        return store.currentList !== null;
+        return !store.isModalOpen() && store.currentList !== null;
     };
 
     // THIS FUNCTION ENABLES THE PROCESS OF EDITING A LIST NAME
