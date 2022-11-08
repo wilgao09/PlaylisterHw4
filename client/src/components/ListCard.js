@@ -1,11 +1,11 @@
-import { useContext, useState } from 'react'
-import { GlobalStoreContext } from '../store'
-import Box from '@mui/material/Box';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import IconButton from '@mui/material/IconButton';
-import ListItem from '@mui/material/ListItem';
-import TextField from '@mui/material/TextField';
+import { useContext, useState } from "react";
+import { GlobalStoreContext } from "../store";
+import Box from "@mui/material/Box";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import IconButton from "@mui/material/IconButton";
+import ListItem from "@mui/material/ListItem";
+import TextField from "@mui/material/TextField";
 
 /*
     This is a card in our list of top 5 lists. It lets select
@@ -24,7 +24,7 @@ function ListCard(props) {
         console.log("handleLoadList for " + id);
         if (!event.target.disabled) {
             let _id = event.target.id;
-            if (_id.indexOf('list-card-text-') >= 0)
+            if (_id.indexOf("list-card-text-") >= 0)
                 _id = ("" + _id).substring("list-card-text-".length);
 
             console.log("load " + event.target.id);
@@ -40,6 +40,7 @@ function ListCard(props) {
     }
 
     function toggleEdit() {
+        if (store.listNameActive) return;
         let newActive = !editActive;
         if (newActive) {
             store.setIsListNameEditActive();
@@ -73,34 +74,38 @@ function ListCard(props) {
     if (store.isListNameEditActive) {
         cardStatus = true;
     }
-    let cardElement =
+    let cardElement = (
         <ListItem
             id={idNamePair._id}
             key={idNamePair._id}
-            sx={{ marginTop: '15px', display: 'flex', p: 1 }}
-            style={{ width: '100%', fontSize: '48pt' }}
+            sx={{ marginTop: "15px", display: "flex", p: 1 }}
+            style={{ width: "100%", fontSize: "48pt" }}
             button
             onClick={(event) => {
-                handleLoadList(event, idNamePair._id)
+                handleLoadList(event, idNamePair._id);
             }}
         >
             <Box sx={{ p: 1, flexGrow: 1 }}>{idNamePair.name}</Box>
             <Box sx={{ p: 1 }}>
-                <IconButton onClick={handleToggleEdit} aria-label='edit'>
-                    <EditIcon style={{fontSize:'48pt'}} />
+                <IconButton onClick={handleToggleEdit} aria-label="edit">
+                    <EditIcon style={{ fontSize: "48pt" }} />
                 </IconButton>
             </Box>
             <Box sx={{ p: 1 }}>
-                <IconButton onClick={(event) => {
-                        handleDeleteList(event, idNamePair._id)
-                    }} aria-label='delete'>
-                    <DeleteIcon style={{fontSize:'48pt'}} />
+                <IconButton
+                    onClick={(event) => {
+                        handleDeleteList(event, idNamePair._id);
+                    }}
+                    aria-label="delete"
+                >
+                    <DeleteIcon style={{ fontSize: "48pt" }} />
                 </IconButton>
             </Box>
         </ListItem>
+    );
 
     if (editActive) {
-        cardElement =
+        cardElement = (
             <TextField
                 margin="normal"
                 required
@@ -109,18 +114,17 @@ function ListCard(props) {
                 label="Playlist Name"
                 name="name"
                 autoComplete="Playlist Name"
-                className='list-card'
+                className="list-card"
                 onKeyPress={handleKeyPress}
                 onChange={handleUpdateText}
                 defaultValue={idNamePair.name}
-                inputProps={{style: {fontSize: 48}}}
-                InputLabelProps={{style: {fontSize: 24}}}
+                inputProps={{ style: { fontSize: 48 } }}
+                InputLabelProps={{ style: { fontSize: 24 } }}
                 autoFocus
             />
+        );
     }
-    return (
-        cardElement
-    );
+    return cardElement;
 }
 
 export default ListCard;
