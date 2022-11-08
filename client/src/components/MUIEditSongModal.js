@@ -62,8 +62,23 @@ export default function MUIEditSongModal() {
                         >
                             Edit Song
                         </div>
-                        <div id="edit-song-modal-content">
-                            <div id="title-prompt" className="modal-prompt">
+                        <div
+                            id="edit-song-modal-content"
+                            style={{
+                                display: "grid",
+                                gridTemplateColumns: "30% 70%",
+                                gridTemplateRows: "33% 33% 33%",
+                                fontSize: "16pt",
+                            }}
+                        >
+                            <div
+                                id="title-prompt"
+                                className="modal-prompt"
+                                style={{
+                                    display: "block",
+                                    gridArea: "1/1/2/2",
+                                }}
+                            >
                                 Title:
                             </div>
                             <input
@@ -72,8 +87,19 @@ export default function MUIEditSongModal() {
                                 type="text"
                                 defaultValue={title}
                                 onChange={handleUpdateTitle}
+                                style={{
+                                    display: "block",
+                                    gridArea: "1/2/2/3",
+                                }}
                             />
-                            <div id="artist-prompt" className="modal-prompt">
+                            <div
+                                id="artist-prompt"
+                                className="modal-prompt"
+                                style={{
+                                    display: "block",
+                                    gridArea: "2/1/3/2",
+                                }}
+                            >
                                 Artist:
                             </div>
                             <input
@@ -82,10 +108,18 @@ export default function MUIEditSongModal() {
                                 type="text"
                                 defaultValue={artist}
                                 onChange={handleUpdateArtist}
+                                style={{
+                                    display: "block",
+                                    gridArea: "2/2/3/3",
+                                }}
                             />
                             <div
                                 id="you-tube-id-prompt"
                                 className="modal-prompt"
+                                style={{
+                                    display: "block",
+                                    gridArea: "3/1/4/2",
+                                }}
                             >
                                 You Tube Id:
                             </div>
@@ -95,6 +129,10 @@ export default function MUIEditSongModal() {
                                 type="text"
                                 defaultValue={youTubeId}
                                 onChange={handleUpdateYouTubeId}
+                                style={{
+                                    display: "block",
+                                    gridArea: "3/2/4/3",
+                                }}
                             />
                         </div>
                         <div
